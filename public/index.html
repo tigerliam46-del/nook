@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="theme.js"></script>
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="auth" class="auth" hidden>
+  <form id="authForm" class="auth-card" autocomplete="on">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="14" style="fill:var(--accent)"/><path d="M14 36V23a10 10 0 0 1 20 0v13z" style="fill:var(--accent-ink)"/><circle cx="24" cy="29" r="3.2" style="fill:var(--accent)"/></svg>
+      <h1 class="wordmark">Nook</h1>
+    </div>
+    <p id="authLead" class="lead">Pick a username and password to get started.</p>
+    <label>Username
+      <input id="authUser" name="username" autocomplete="username" required minlength="3" maxlength="20">
+    </label>
+    <label>Password
+      <input id="authPass" name="password" type="password" autocomplete="current-password" required minlength="8">
+    </label>
+    <p id="authError" class="error" role="alert"></p>
+    <button id="authSubmit" class="primary" type="submit">Create account</button>
+    <button id="authSwap" class="link" type="button">I already have an account</button>
+  </form>
+</main>
+
+<div id="app" class="app" hidden>
+  <nav class="rail" id="rail" aria-label="Servers"></nav>
+
+  <aside class="side">
+    <header class="side-head">
+      <h2 id="serverName"></h2>
+      <button id="inviteBtn" class="ghost" type="button">Invite</button>
+      <button id="settingsBtn" class="ghost" type="button" hidden>Settings</button>
+    </header>
+    <div class="side-section">
+      <span id="sideLabel">Channels</span>
+      <button id="addChannel" class="icon" type="button" title="New channel" hidden>+</button>
+    </div>
+    <div id="channels" class="channels"></div>
+    <div id="voiceBar" class="voicebar" hidden>
+      <div><b>Voice connected</b><small id="voiceName"></small></div>
+      <button id="muteBtn" type="button">Mute</button>
+      <button id="leaveBtn" class="danger" type="button">Leave</button>
+    </div>
+    <footer class="me">
+      <span id="meDot" class="avatar small"></span>
+      <span id="meName"></span>
+      <button id="themeBtn" class="ghost" type="button" title="Change theme"></button>
+      <button id="logout" class="ghost" type="button">Log out</button>
+    </footer>
+  </aside>
+
+  <section class="chat" id="chat">
+    <header class="chat-head"><h1 id="channelName"># </h1></header>
+    <div id="messages" class="messages" aria-live="polite"></div>
+    <div id="typing" class="typing"></div>
+    <div class="composer">
+      <textarea id="input" rows="1" maxlength="2000" placeholder="Write a message. Enter sends, Shift+Enter adds a line."></textarea>
+    </div>
+  </section>
+
+  <section class="chat" id="friends" hidden>
+    <header class="chat-head">
+      <h1>Friends</h1>
+      <nav class="tabs" id="friendTabs"></nav>
+    </header>
+    <form id="addFriend" class="addfriend">
+      <input id="addFriendInput" placeholder="Add a friend by username" maxlength="20" autocomplete="off" required>
+      <button class="primary" type="submit">Send request</button>
+    </form>
+    <p id="friendMsg" class="friendmsg" role="status"></p>
+    <div id="friendList" class="flist"></div>
+  </section>
+
+  <aside class="members" id="members" aria-label="Members"></aside>
+</div>
+
+<dialog id="choiceDlg" class="dlg">
+  <h3>Add a server</h3>
+  <p>Start your own, or join a friend's with their invite code.</p>
+  <div class="row">
+    <button id="choiceCreate" class="primary" type="button">Create a server</button>
+    <button id="choiceJoin" type="button">Join with a code</button>
+  </div>
+  <button class="link" type="button" data-close>Cancel</button>
+</dialog>
+
+<dialog id="askDlg" class="dlg">
+  <form method="dialog" id="askForm">
+    <h3 id="askTitle"></h3>
+    <label><span id="askLabel"></span><input id="askInput" required maxlength="40"></label>
+    <div class="row">
+      <button value="cancel" type="submit" formnovalidate>Cancel</button>
+      <button value="ok" class="primary" type="submit">Continue</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="profileDlg" class="dlg profile">
+  <div id="profileBody"></div>
+  <div class="row">
+    <button id="profileEdit" class="primary" type="button" hidden>Edit profile</button>
+    <button type="button" data-close>Close</button>
+  </div>
+</dialog>
+
+<dialog id="editDlg" class="dlg">
+  <form id="editForm" method="dialog">
+    <h3>Edit your profile</h3>
+    <div class="preview"><span id="editAvatar" class="avatar"></span><b id="editName"></b></div>
+    <div class="row avrow"><button type="button" id="avatarPick">Upload picture</button><button type="button" id="avatarClear" class="link">Remove</button><input id="avatarFile" type="file" accept="image/*" hidden></div>
+    <label>Colour<div id="swatches" class="swatches"></div></label>
+    <label>Status<input id="editStatus" maxlength="50" placeholder="What are you up to?"></label>
+    <label>About you<textarea id="editBio" rows="3" maxlength="190" placeholder="A few words about you"></textarea></label>
+    <div class="row">
+      <button value="cancel" type="submit" formnovalidate>Cancel</button>
+      <button value="save" class="primary" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="aboutDlg" class="dlg">
+  <div id="aboutBody"></div>
+  <div class="row"><button type="button" data-close>Close</button></div>
+</dialog>
+
+<dialog id="settingsDlg" class="dlg wide">
+  <h3>Server settings</h3>
+  <nav id="settingsTabs" class="tabs"></nav>
+  <div id="settingsBody"></div>
+  <div class="row"><button type="button" data-close>Close</button></div>
+</dialog>
+
+<dialog id="helpDlg" class="dlg wide">
+  <h3>How Nook works</h3>
+  <h4>Servers and channels</h4>
+  <p>A server is a space for a group. Press + on the left to create one or join with an invite code. Inside, text channels (#) hold the conversation and voice channels (🔊) are for talking. Click the server name to see who is in it and how many are online.</p>
+  <h4>Friends and direct messages</h4>
+  <p>Click the Nook logo to go Home. Add friends by username, accept requests in Pending, then press Message to chat privately.</p>
+  <h4>Voice</h4>
+  <p>Click a voice channel to join. Your browser will ask for the microphone. Audio goes straight between people, up to 8 per channel.</p>
+  <h4>Roles and settings</h4>
+  <p>Owners and people with the right role can open Settings to rename the server, write a description, make roles with colours and powers, and give them to members.</p>
+  <h4>Your profile</h4>
+  <p>Click your name at the bottom left, then Edit profile to upload a picture, pick a colour and set a status and bio. Use Theme to switch the look.</p>
+  <div class="row"><button type="button" data-close>Got it</button></div>
+</dialog>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
